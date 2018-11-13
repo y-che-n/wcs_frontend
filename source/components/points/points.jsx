@@ -26,6 +26,9 @@ class Points extends Component {
             const committees = response.data.data.committees;
             const office_hours = response.data.data.office_hours;
 
+            console.log(response.data.data.committees);
+            console.log(committees);
+
             let event_points = 0;
             let committee_points = committees.length * 0.5;
             let office_hour_points = office_hours.length * 0.5;
