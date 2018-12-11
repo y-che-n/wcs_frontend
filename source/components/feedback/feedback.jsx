@@ -39,7 +39,7 @@ class Feedback extends Component {
        };
       axios({
         method: 'post',
-        url: 'https://slack.com/api/chat.postMessage?token=xoxp-488468375939-489621591047-500355993635-372d86a9e8cad921020c48cb8600f4f1&channel=UEDJ9HD1D&text=' + body.text,
+        url: 'https://slack.com/api/chat.postMessage?token=[token]&channel=UEDJ9HD1D&text=' + body.text,
         data: body
       },
       { headers: {'Content-Type':'application/json'}})
