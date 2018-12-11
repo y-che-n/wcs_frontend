@@ -1,0 +1,20 @@
+.Users {
+    &__user {
+        border-top-color: #E36166 !important;
+        border-top-width: 2px !important;
+    }
+
+    &__statistic {
+        float: right !important;
+    }
+
+    &__flex {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    &__flexItem {
+
+    }
+
+}
