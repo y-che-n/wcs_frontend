@@ -18,8 +18,6 @@ class NewEvent extends Component {
             pw: ''
         }
 
-      //  this.categoryOptions = ['General Meeting', 'Tech Team', 'Mentoring', 'Social', 'Outreach']
-
         this.handleName = this.handleName.bind(this);
         this.handlePoints = this.handlePoints.bind(this);
         this.handleDate = this.handleDate.bind(this);
@@ -61,7 +59,7 @@ class NewEvent extends Component {
             pw: this.state.pw
         };
 
-        axios.post('http://points-api.illinoiswcs.org/api/events', newEvent).then( (response) => {
+        axios.post('http://localhost:3000/api/events', newEvent).then( (response) => {
             console.log(response);
             this.handleStatus(response);
         }).catch(e => {
@@ -71,7 +69,7 @@ class NewEvent extends Component {
 
     handleStatus(response) {
       if (response.status === 201)
-        notify.show(`event ${response.data.data.name} was created`, "success")
+        notify.show(`event ${response.data.data.name} was created! the event key is ${response.data.data.key}.`, "success")
       else if (response.status === 500)
         notify.show("please try again", "error");
     }
@@ -80,7 +78,7 @@ class NewEvent extends Component {
 
     }
     render() {
-      let categoryOptions = ['General Meeting', 'Tech Team', 'Mentoring', 'Social', 'Outreach']
+      let categoryOptions = ['General Meeting', 'Tech Team', 'Mentoring', 'Social', 'Outreach', 'Corporate', 'Other']
       let categorySelectionOptions = []
       categoryOptions.forEach( (option) => {
           let categoryOption = {};
