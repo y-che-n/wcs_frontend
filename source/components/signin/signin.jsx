@@ -17,6 +17,7 @@ class SignIn extends Component {
             events: [],
             event_name: '',
             event_id: '',
+            event_key: '',
             value: '',
             error: '',
             date: new Date(Date.now()).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"})
@@ -28,23 +29,28 @@ class SignIn extends Component {
         this.handleEnterEvent = this.handleEnterEvent.bind(this);
         this.handleEnterCommittee = this.handleEnterCommittee.bind(this);
         this.handleEnterOH = this.handleEnterOH.bind(this);
+        this.handlEnterGWC = this.handleEnterGWC.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChangeKey = this.handleChangeKey.bind(this);
     }
 
     handleSubmit(type) {
         // Validate netid here and set error state if there's problems
         if (type === 'event') {
-          axios.put('http://points-api.illinoiswcs.org/api/events/' + this.state.event_id, { event_id: this.state.event_id, netid: this.state.value }).then( (response) => {
-              console.log(response)
+          axios.put('http://localhost:3000/api/events/' + this.state.event_id, { event_id: this.state.event_id, netid: this.state.value, event_key: this.state.event_key }).then( (response) => {
+              console.log(response);
+              this.handleStatus(response);
+          }).catch(e => {
+              this.handleStatus(e.response);
           });
-        } else if (type === 'committee' || type === 'office_hours'){
+        } else if (type === 'committee' || type === 'office_hours' || type === 'gwc'){
             const update = {
                 netid: this.state.value,
                 type: type,
                 date: this.state.date
             }
 
-            axios.put('http://points-api.illinoiswcs.org/api/users/' + this.state.value, update).then( (response) => {
+            axios.put('http://localhost:3000/api/users/' + this.state.value, update).then( (response) => {
                 console.log(response);
                 this.handleStatus(response);
             }).catch(e => {
@@ -54,10 +60,11 @@ class SignIn extends Component {
     }
 
     handleStatus(response) {
+      console.log(response.data.message)
       if (response.status === 200)
         notify.show(`hello ${response.data.data.netid}!`, "success")
       else if (response.status === 404)
-        notify.show("invalid netid", "error")
+        notify.show(response.data.message, "error")
       else if (response.status === 500)
         notify.show("server error!", "error");
     }
@@ -80,8 +87,18 @@ class SignIn extends Component {
       }
     }
 
+    handleEnterGWC(tgt) {
+      if (tgt.charCode === 13) {
+        this.handleSubmit('gwc');
+      }
+    }
+
     handleChange(event) {
         this.setState({value: event.target.value});
+    }
+
+    handleChangeKey(event) {
+      this.setState({event_key: event.target.value});
     }
 
     handleEventSelect(e, data) {
@@ -102,7 +119,7 @@ class SignIn extends Component {
     }
 
     componentWillMount() {
-        axios.get('http://points-api.illinoiswcs.org/api/events').then( (response) => {
+        axios.get('http://localhost:3000/api/events').then( (response) => {
             let events = response.data.data;
             events.sort(function(a, b) {
                 var nameA = a.name.toUpperCase(); // ignore upper and lowercase
@@ -162,6 +179,12 @@ class SignIn extends Component {
                 <Input fluid placeholder='Enter your NetID ...' value={this.state.value} onChange={this.handleChange} onKeyPress={this.handleEnterEvent}/>
 
                 <br />
+
+                <h4>Event Key</h4>
+
+                <Input fluid placeholder='Enter the event key...' value={this.state.event_key} onChange={this.handleChangeKey} onKeyPress={this.handleEnterEvent}/>
+
+                <br />
                 { this.state.error }
                 <Button fluid onClick={() => this.handleSubmit('event')}>Sign-in</Button>
 
@@ -178,6 +201,7 @@ class SignIn extends Component {
                 <Button fluid onClick={() => this.handleSubmit('committee')}>Sign-in</Button>
 
             </Tab.Pane> },
+
           { menuItem: 'Office Hour', render: () =>
             <Tab.Pane attached={false}>
                 <h4>Date</h4>
@@ -188,6 +212,17 @@ class SignIn extends Component {
                 <br />
                 <Button fluid onClick={() => this.handleSubmit('office_hours')}>Sign-in</Button>
             </Tab.Pane> },
+
+            { menuItem: 'Girls Who Code', render: () =>
+              <Tab.Pane attached={false}>
+                  <h4>Date</h4>
+                  <Input fluid value={this.state.date} onChange={this.handleChange} onKeyPress={this.handleEnterGWC}/>
+                  <br />
+                  <h4>NetId</h4>
+                  <Input fluid placeholder='Enter your NetID ...' value={this.state.value} onChange={this.handleChange} onKeyPress={this.handleEnterGWC}/>
+                  <br />
+                  <Button fluid onClick={() => this.handleSubmit('gwc')}>Sign-in</Button>
+              </Tab.Pane> },
         ]
 
         return(
